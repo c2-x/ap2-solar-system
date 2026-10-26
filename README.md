@@ -6,7 +6,7 @@
 
 ## 1. 运行方式
 
-**在线演示（公网 URL）：[https://yci3p37s75xqu.ok.kimi.link/](https://yci3p37s75xqu.ok.kimi.link/)**
+**在线演示（公网 URL）：[https://c2-x.github.io/ap2-solar-system/](https://c2-x.github.io/ap2-solar-system/)**
 
 已核验公网页面、矩阵模块与地球纹理可访问，并在浏览器中实际启动场景、测试投影切换。
 
@@ -102,7 +102,7 @@ texture.colorSpace = THREE.SRGBColorSpace
 
 | 透视投影：近大远小 | 正交投影：尺寸不随深度缩小 |
 |---|---|
-| ![透视投影](https://yci3p37s75xqu.ok.kimi.link/screenshots/01-perspective.png) | ![正交投影](https://yci3p37s75xqu.ok.kimi.link/screenshots/02-orthographic.png) |
+| ![透视投影](https://c2-x.github.io/ap2-solar-system/screenshots/01-perspective.png) | ![正交投影](https://c2-x.github.io/ap2-solar-system/screenshots/02-orthographic.png) |
 
 - **透视投影**：投影线在相机处汇聚，近处土星等天体显得更大，平行轨道在画面中产生透视收缩。
 - **正交投影**：投影线彼此平行，没有近大远小，天体的投影尺寸不随相机深度改变，更适合观察几何关系。
@@ -129,13 +129,13 @@ submission/
 
 ### 地月层级与轴倾角
 
-![地月系统](https://yci3p37s75xqu.ok.kimi.link/screenshots/03-earth-moon.png)
+![地月系统](https://c2-x.github.io/ap2-solar-system/screenshots/03-earth-moon.png)
 
 ### 土星环与小行星带扩展
 
-![土星](https://yci3p37s75xqu.ok.kimi.link/screenshots/04-saturn.png)
+![土星](https://c2-x.github.io/ap2-solar-system/screenshots/04-saturn.png)
 
-**10 秒漫游录屏：** [观看录屏](https://yci3p37s75xqu.ok.kimi.link/media/solar-tour.webm)
+**10 秒漫游录屏：** [观看录屏](https://c2-x.github.io/ap2-solar-system/media/solar-tour.webm)
 
 ## 8. 验证记录
 
