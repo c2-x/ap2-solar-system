@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AP2 三维层级场景：可交互太阳系，演示矩阵层级、双投影和相机漫游。">
+  <title>HELIO · 太阳系层级实验室</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><circle cx=%2216%22 cy=%2216%22 r=%2210%22 fill=%22%23efb45f%22/></svg>">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="importmap">
+    {"imports":{"three":"./vendor/three.module.js","three/addons/controls/OrbitControls.js":"./vendor/OrbitControls.js"}}
+  </script>
+</head>
+<body>
+  <main id="app">
+    <canvas id="scene" aria-label="交互式三维太阳系"></canvas>
+    <div id="labels" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="返回全景"><span class="brand-mark">H</span><span><b>HELIO</b><small>太阳系层级实验室</small></span></a>
+      <div class="project-tag"><span>ASSIGNED PROJECT</span><b>AP2 · 三维层级场景</b></div>
+      <button id="help-button" class="icon-button" aria-label="查看操作帮助">?</button>
+    </header>
+
+    <aside class="panel controls-panel">
+      <div class="panel-heading"><span>SIMULATION CONTROL</span><h2>模拟控制台</h2></div>
+      <button id="play" class="primary-button"><span id="play-icon">Ⅱ</span><span id="play-label">暂停模拟</span><kbd>SPACE</kbd></button>
+      <div class="control-group">
+        <label for="orbit-speed"><span>公转速度</span><output id="orbit-value">1.00×</output></label>
+        <input id="orbit-speed" type="range" min="0" max="3" step="0.05" value="1">
+        <div class="range-marks"><span>静止</span><span>3×</span></div>
+      </div>
+      <div class="control-group">
+        <label for="spin-speed"><span>自转速度</span><output id="spin-value">1.00×</output></label>
+        <input id="spin-speed" type="range" min="0" max="3" step="0.05" value="1">
+        <div class="range-marks"><span>静止</span><span>3×</span></div>
+      </div>
+      <div class="control-group">
+        <label for="axial-tilt"><span>地球轴倾角</span><output id="tilt-value">23.5°</output></label>
+        <input id="axial-tilt" type="range" min="0" max="45" step="0.5" value="23.5">
+        <div class="range-marks"><span>0°</span><span>45°</span></div>
+      </div>
+      <div class="separator"></div>
+      <label class="switch-row"><span>显示行星轨道<kbd>L</kbd></span><input id="show-orbits" type="checkbox" checked><i></i></label>
+      <label class="switch-row"><span>显示天体标签</span><input id="show-labels" type="checkbox" checked><i></i></label>
+      <label class="switch-row"><span>显示小行星带</span><input id="show-asteroids" type="checkbox" checked><i></i></label>
+      <div class="separator"></div>
+      <span class="section-label">CAMERA PRESETS</span>
+      <div class="view-buttons">
+        <button data-view="overview" class="active">全景 <kbd>1</kbd></button>
+        <button data-view="earth">地月 <kbd>2</kbd></button>
+        <button data-view="saturn">土星 <kbd>3</kbd></button>
+      </div>
+      <button id="tour" class="secondary-button active"><span class="tour-dot"></span><span id="tour-label">漫游进行中</span><kbd>T</kbd></button>
+    </aside>
+
+    <aside class="panel info-panel">
+      <div class="eyebrow">CELESTIAL BODY / <span id="body-index">03</span></div>
+      <div class="body-title"><span id="body-dot"></span><div><h2 id="body-name">地球</h2><span id="body-en">EARTH</span></div></div>
+      <p id="body-description">我们的家园。自转轴倾斜 23.5°，并拥有一颗天然卫星。</p>
+      <dl>
+        <div><dt>场景半径</dt><dd id="body-radius">1.00 u</dd></div>
+        <div><dt>轨道半径</dt><dd id="body-distance">21.0 u</dd></div>
+        <div><dt>相对公转周期</dt><dd id="body-period">20 s</dd></div>
+      </dl>
+      <button id="focus-body" class="secondary-button">聚焦此天体 <span>↗</span></button>
+      <div class="scale-note"><span>i</span> 为清晰展示层级关系，尺寸与距离采用压缩教学尺度。</div>
+    </aside>
+
+    <div class="projection-control" role="group" aria-label="投影模式">
+      <button id="projection" title="按 O 切换投影"><span id="projection-icon">◈</span><span id="projection-label">透视投影</span><kbd>O</kbd></button>
+    </div>
+
+    <nav class="planet-nav" aria-label="选择天体">
+      <button data-body="sun" class="selected"><i style="--c:#f5b44b"></i><span>太阳</span></button>
+      <button data-body="mercury"><i style="--c:#aaa49b"></i><span>水星</span></button>
+      <button data-body="venus"><i style="--c:#d8b36d"></i><span>金星</span></button>
+      <button data-body="earth"><i style="--c:#62a8d8"></i><span>地球</span></button>
+      <button data-body="mars"><i style="--c:#c56f4b"></i><span>火星</span></button>
+      <button data-body="jupiter"><i style="--c:#d9b892"></i><span>木星</span></button>
+      <button data-body="saturn"><i style="--c:#dbc78e"></i><span>土星</span></button>
+      <button data-body="uranus"><i style="--c:#93d4d5"></i><span>天王星</span></button>
+      <button data-body="neptune"><i style="--c:#527fd5"></i><span>海王星</span></button>
+    </nav>
+
+    <footer class="statusbar">
+      <span><i class="live-dot"></i><b id="status">LIVE</b></span>
+      <span>拖拽旋转 · 滚轮缩放 · 点击天体查看</span>
+      <span class="frame-readout">WEBGL 2.0 <i></i> THREE.JS</span>
+    </footer>
+
+    <dialog id="help">
+      <button id="close-help" class="icon-button" aria-label="关闭">×</button>
+      <span class="section-label">QUICK GUIDE</span><h2>探索太阳系</h2>
+      <p>漫游会沿预设关键帧平滑环绕。拖拽或滚轮操作会立即接管相机；按 T 可继续漫游。</p>
+      <div class="shortcut-grid"><span>暂停 / 继续<kbd>SPACE</kbd></span><span>切换投影<kbd>O</kbd></span><span>接管 / 继续漫游<kbd>T</kbd></span><span>显示 / 隐藏轨道<kbd>L</kbd></span><span>恢复全景<kbd>R</kbd></span><span>三种预设视角<kbd>1–3</kbd></span></div>
+      <p class="help-note">O 键在相同相机位置下比较透视与正交投影：透视有近大远小，正交保持平行关系。</p>
+    </dialog>
+    <div id="loading"><span class="loader-orbit"></span><b>正在构建太阳系</b><small>LOADING CELESTIAL TEXTURES</small></div>
+  </main>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
